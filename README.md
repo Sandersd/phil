@@ -91,4 +91,4 @@ docker run -p 3000:3000 philsphabulousphinds
 
 ## License
 
-© 2024 PhilsPhabulousPhinds. All rights reserved.
+© 2025 PhilsPhabulousPhinds. All rights reserved.
