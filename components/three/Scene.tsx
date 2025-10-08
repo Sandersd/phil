@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useRef, useCallback, useEffect } from 'react'
+import { Suspense, useRef, useCallback, useEffect, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Float, Environment, PerspectiveCamera } from '@react-three/drei'
 import { Group } from 'three'
@@ -12,6 +12,18 @@ function SceneContent() {
   const groupRef = useRef<Group>(null)
   const mouseTargetRef = useRef({ x: 0, y: 0 })
   const mouseLerpRef = useRef({ x: 0, y: 0 })
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Mouse tracking for parallax effect
   const handleMouseMove = useCallback((event: MouseEvent) => {
@@ -62,25 +74,31 @@ function SceneContent() {
       <pointLight position={[8, 2, -3]} intensity={0.15} color="#f0f0ff" />
       
       <group ref={groupRef}>
-        <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-          <FloatingObject position={[-8, 3, -6]} type="bracelet" />
-        </Float>
-        
-        <Float speed={3} rotationIntensity={0.3} floatIntensity={0.7}>
-          <FloatingObject position={[7, -2, -9]} type="silver-bracelet" />
-        </Float>
-        
+        {/* Always show the gem (center, most visible) */}
         <Float speed={2.5} rotationIntensity={0.4} floatIntensity={0.6}>
           <FloatingObject position={[0, 1, -3]} type="gem" />
         </Float>
         
-        <Float speed={2.2} rotationIntensity={0.2} floatIntensity={0.8}>
-          <FloatingObject position={[9, 2, -7]} type="pearl-blossom" />
-        </Float>
-        
-        <Float speed={3.5} rotationIntensity={0.7} floatIntensity={0.3}>
-          <FloatingObject position={[-6, -1, -1]} type="floral-dress" />
-        </Float>
+        {/* Desktop-only models (save 58.5MB on mobile) */}
+        {!isMobile && (
+          <>
+            <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+              <FloatingObject position={[-8, 3, -6]} type="bracelet" />
+            </Float>
+            
+            <Float speed={3} rotationIntensity={0.3} floatIntensity={0.7}>
+              <FloatingObject position={[7, -2, -9]} type="silver-bracelet" />
+            </Float>
+            
+            <Float speed={2.2} rotationIntensity={0.2} floatIntensity={0.8}>
+              <FloatingObject position={[9, 2, -7]} type="pearl-blossom" />
+            </Float>
+            
+            <Float speed={3.5} rotationIntensity={0.7} floatIntensity={0.3}>
+              <FloatingObject position={[-6, -1, -1]} type="floral-dress" />
+            </Float>
+          </>
+        )}
       </group>
       
       <Environment preset="city" />
